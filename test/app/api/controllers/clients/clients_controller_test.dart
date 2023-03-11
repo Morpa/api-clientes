@@ -1,19 +1,25 @@
 import 'package:api_clientes/app/api/api.dart';
 import 'package:test/test.dart';
 
+import '../../../../mock.dart';
+
 void main() {
   late ClientsController controller;
+  late MockGetClientsUseCase mockGetClientsUseCase;
 
   setUpAll(() {
-    controller = ClientsController();
+    mockGetClientsUseCase = MockGetClientsUseCase();
+    controller = ClientsController(
+      getClientsUseCase: mockGetClientsUseCase,
+    );
   });
 
   group('ClientsController:', () {
-    test('should contain a route "/clients"', () async {
+    test('should be contain a route "/clients"', () async {
       expect(controller.route, '/clients');
     });
 
-    test('should contain a key "GET" for the handler GetClientsHandler',
+    test('should be contain a key "GET" for the handler GetClientsHandler',
         () async {
       expect(controller.handlers['GET'], isA<GetClientsHandler>());
     });

@@ -1,25 +1,53 @@
 import 'package:api_clientes/app/api/api.dart';
+import 'package:api_clientes/app/domain/domain.dart';
+import 'package:mocktail/mocktail.dart';
 import 'package:test/test.dart';
 
+import '../../../../mock.dart';
+
 void main() {
-  test('should have an instance of ResponseHandler', () async {
-    final handler = GetClientsHandler();
-    final result = await handler.call();
+  late GetClientsHandler handler;
+  late MockGetClientsUseCase mockGetClientsUseCase;
 
-    expect(result, isA<ResponseHandler>());
+  setUpAll(() {
+    mockGetClientsUseCase = MockGetClientsUseCase();
+    handler = GetClientsHandler(getClientsUseCase: mockGetClientsUseCase);
   });
 
-  test('should return a status OK', () async {
-    final handler = GetClientsHandler();
-    final result = await handler.call();
+  group('GetClientsHandler:', () {
+    test('should be have an instance of ResponseHandler', () async {
+      when(() => mockGetClientsUseCase.call()).thenAnswer((_) async => []);
 
-    expect(result.status, StatusHandler.ok);
-  });
+      final result = await handler.call();
 
-  test('should return a List of ClientOutputDTO', () async {
-    final handler = GetClientsHandler();
-    final result = await handler.call();
+      expect(result, isA<ResponseHandler>());
+    });
 
-    expect(result.body, isA<List<ClientOutputDTO>>());
+    test('should be return a status OK', () async {
+      when(() => mockGetClientsUseCase.call()).thenAnswer((_) async => []);
+
+      final result = await handler.call();
+
+      expect(result.status, StatusHandler.ok);
+    });
+
+    test('should be return a List of ClientOutputDTO', () async {
+      when(() => mockGetClientsUseCase.call()).thenAnswer((_) async =>
+          [Client(id: 1, name: 'name', email: 'email', phone: 'phone')]);
+
+      final result = await handler.call();
+
+      expect(result.body, isA<List<ClientOutputDTO>>());
+    });
+
+    test(
+        'should be return a status internalServerError when an unknown error happens',
+        () async {
+      when(() => mockGetClientsUseCase.call()).thenThrow(Exception());
+
+      final result = await handler.call();
+
+      expect(result.status, StatusHandler.internalServerError);
+    });
   });
 }
